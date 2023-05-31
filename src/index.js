@@ -7,11 +7,19 @@ const client = new Client({
         IntentsBitField.Flags.GuildMembers,
         IntentsBitField.Flags.GuildMessages,
         IntentsBitField.Flags.MessageContent,
+        IntentsBitField.Flags.GuildVoiceStates,
     ]
 });
 
+const botChannelId = '1100223124055789668';
+
 client.on('ready', (c) => {
     console.log(`${c.user.tag} is online.`);
+
+    client.user.setActivity({
+        name: "BonkusWare",
+        type: ActivityType.Competing
+    })
 
 })
 
@@ -20,7 +28,7 @@ client.on('messageCreate', (message) => {
         return;
     }
 
-    if(message.content === "binkus"){
+    if(message.content.toLowerCase().trim() === "binkus"){
         message.reply('bonkus');
     }
 })
@@ -89,6 +97,23 @@ client.on('messageCreate', (message) => {
     }
 
 })
+
+client.on('voiceStateUpdate', (oldState, newState) => {
+
+    const botChannel = client.channels.cache.get(botChannelId);
+
+    if(oldState.channelId == null){
+        console.log("user joined vc");
+        const message = `${oldState.member} has joined ${newState.channel}!`
+        botChannel.send(message);
+    }
+    if(newState.channelId == null){
+        console.log("user joined vc");
+        const message = `${oldState.member} has left ${oldState.channel} :(`
+        botChannel.send(message);
+    }
+
+});
 
 client.login(process.env.TOKEN);
 
